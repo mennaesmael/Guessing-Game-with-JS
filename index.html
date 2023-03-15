@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> Guessing Game</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+</head>
+
+<body>
+    
+    <div id="Firstsection" class="container">
+        <input type="text" placeholder="Write Down your Name" id="FN" name="Name" required ><br><br>
+        <label for=""><b>Choose the game difficulty:</b></label><br>
+
+        <input type="radio" name="Diff" id="choice1" value="easy" checked>
+        <label for="choice1">Easy</label><br>
+
+        <input type="radio" name="Diff" id="choice2" value="medium">
+        <label for="choice2">Medium</label><br>
+
+        <input type="radio" name="Diff" id="choice3" value="hard">
+        <label for="choice3">Hard</label><br>
+
+        <input type="radio" name="Diff" id="choice4" value="custom">
+        <label for="choice4">Custom</label>
+        <input type="number" placeholder="Wtite Down the Number of Attempts" id="Max" name="MaxNum" ><br><br>
+
+        <input type="number" placeholder="Enter the Maximum Number" id="guessnum" name="range" required
+           ><br>
+        <input type="submit" value="Start!" onclick="First_SECTION()">
+        <div id="Checks"></div>
+    </div>
+
+    
+
+
+    <div id="Secondsection" style="display: none;" class="container">
+        <h3 id="demo"></h3>
+        <div id="Currentmsg">Current number of attempts left: </div>
+        Your Guess: <input type="number" id="guess" name="USerGuessField" ><br><br>
+        <button type="button" onclick="Second_SECTION()"> Check!</button>
+        <b>
+            <div id="msg"></div>
+        </b>
+    </div>
+
+    
+
+
+    <div id="Thirdsection" style="display: none;" class="container">
+        <h3 id="thirdMSG"></h3>
+        <button type="button" onclick="CurrentSetting()"> Play Again </button>
+        <button type="submit" onclick="ChangeDifficulty()"> Change difficulty </button>
+    </div>
+
+
+
+    <script>
+
+        
+        function First_SECTION() {
+
+            let name = document.getElementById("FN").value;
+            
+            let maximum = document.getElementById("guessnum").value;
+            let TurnIntoString = parseInt(maximum);
+            Rrand = Math.floor(Math.random() * (TurnIntoString - 0 + 1)) + 0;
+            sessionStorage.setItem("Rand", Rrand);
+
+           
+            var choice = document.querySelector('input[name="Diff"]:checked').value;
+            var choice_value;
+            if (choice == 'easy') {
+                choice_value = 6;
+
+            } else if (choice == 'medium') {
+                choice_value = 3;
+
+            } else if (choice == 'hard') {
+                choice_value = 2;
+
+            } else if (choice == 'custom') {
+                choice_value = document.getElementById("Max").value;
+            }
+            sessionStorage.setItem("Difficulty", choice_value);
+
+            
+            if (name == "" || maximum == "" || TurnIntoString <= 0 || (choice == 'custom' && document.getElementById("Max").value <= 0)) {
+                if (name == "") {
+                    document.getElementById("Checks").innerHTML = "<b>Please Enter your Name</b>";
+                } else if (maximum == "") {
+                    document.getElementById("Checks").innerHTML = "<b>please Enter the Maximun Number</b>";
+                } else if (TurnIntoString <= 0) {
+                    document.getElementById("Checks").innerHTML = "<b>The maximum number Should be GREATER than 0</b>";
+                } else if (document.getElementById("Max").value == "") {
+                    document.getElementById("Checks").innerHTML = "<b>please Enter the Number of Attempts</b>";
+                } else {
+                    document.getElementById("Checks").innerHTML = "<b>The Number of Attempts Should be GREATER than 0</b>";
+                }
+            }
+            else {
+                document.getElementById("Firstsection").style.display = "none";
+                document.getElementById("Secondsection").style.display = "block";
+                document.getElementById("demo").innerHTML = "Welcome Player: " + name;
+                let attemptsLeft = document.getElementById("Currentmsg");
+                attemptsLeft.innerHTML += choice_value;
+            }
+
+        }
+
+      
+        let counter = 1;
+
+        function Second_SECTION() {
+            Random = sessionStorage.getItem("Rand");
+            let max = parseInt(document.getElementById("guessnum").value);
+            let userGuess = parseInt(document.getElementById("guess").value);
+            let msg = document.getElementById("msg");
+            let attemptsLeft = document.getElementById("Currentmsg");
+            if (counter < sessionStorage.getItem("Difficulty") || userGuess == Random || userGuess > max || userGuess < 0 || document.getElementById("guess").value == "") {
+                if (userGuess <= max && userGuess >= 0) {
+                    let left = sessionStorage.getItem("Difficulty") - counter;
+                    attemptsLeft.innerHTML = "Current number of attempts left:" + left;
+                    counter++;
+                    if (userGuess > Random) { msg.innerHTML = "Your guess is higher than the number you need to go LOWER" }
+                    else if (userGuess < Random) { msg.innerHTML = "Your guess is lower than the number you need to go HIGHER" }
+                    else {
+                        document.getElementById("thirdMSG").innerHTML = "Congratulations you Win the game!!";
+                        document.getElementById("Secondsection").style.display = "none";
+                        document.getElementById("Thirdsection").style.display = "block";
+                    }
+                }
+                else { msg.innerHTML = "Guess a number between 0 and  " + max; }
+
+            }
+            else {
+                document.getElementById("thirdMSG").innerHTML = "No More Attempts Available, The namber was: " + Random + "<br> you have lost the game ...";
+                document.getElementById("Secondsection").style.display = "none";
+                document.getElementById("Thirdsection").style.display = "block";
+            }
+        }
+
+
+
+
+
+       
+        function ChangeDifficulty() {
+            document.getElementById("Firstsection").style.display = "block";
+            document.getElementById("Thirdsection").style.display = "none";
+            window.location.href = window.location.href;
+
+        }
+
+
+
+       
+        function CurrentSetting() {
+            document.getElementById("msg").innerHTML = "";
+            document.getElementById("guess").value = "";
+            if (counter != 0) {
+                document.getElementById("Thirdsection").style.display = "none";
+                document.getElementById("Secondsection").style.display = "block";
+                counter = 1;
+               
+
+                
+                let maximum = document.getElementById("guessnum").value;
+                let TurnIntoString = parseInt(maximum);
+                Rrand = Math.floor(Math.random() * (TurnIntoString - 0 + 1)) + 0;
+                sessionStorage.setItem("Rand", Rrand);
+            }
+
+            let attemptsLeft = document.getElementById("Currentmsg");
+            attemptsLeft.innerHTML = "Current number of attempts left:" + sessionStorage.getItem("Difficulty");
+        }
+
+    </script>
+
+</body>
+
+</html>
